@@ -1,0 +1,24 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: postgres_container
+    environment:
+      POSTGRES_DB: test
+      POSTGRES_USER: test_user
+      POSTGRES_PASSWORD: aboba
+    ports:
+      - "5432:5432"
+    volumes:
+      - ./init.sql:/docker-entrypoint-initdb.d/init.sql  # Копируем init.sql в контейнер
+
+  python:
+    image: python:3.10-slim
+    container_name: python_container
+    depends_on:
+      - postgres
+    volumes:
+     - ./DBoperations.py:/app/script.py
+     - ./requirements.txt:/app/requirements.txt
+    working_dir: /app
+    command: >
+      sh -c "pip install -r requirements.txt && python script.py"
